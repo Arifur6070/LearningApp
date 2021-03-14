@@ -27,10 +27,9 @@ class Course extends Model{
        'start_date',
        'end_date',
        'type',
-       'created_at',
-       'updated_at',
        'course_description',
-       'course_price'
+       'course_price',
+       'course_name'
    ];
 
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\SendEmailController;
 
 
 /*
@@ -47,5 +48,8 @@ Route::group([
     Route::get('/courses/{id}', [CourseController::class, 'displayCourseDetails']);
     Route::get('/class-schedule/{id}', [StudentController::class, 'showEnrolledCourses']);
     Route::get('/taught-courses/{id}', [TeacherController::class, 'showTeachingCourses']);
+    Route::post('/create-course', [CourseController::class, 'createCourse']);
+    Route::get('/subjects', [CourseController::class, 'getAllSubjects']);
+    // Route::get('/send-email', [SendEmailController::class, 'sendEmail']);
 }
 );

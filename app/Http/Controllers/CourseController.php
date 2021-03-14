@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Course;
+use Exception;
+use Validator;
 use DB;
+// use Carbon\Carbon;
 
 class CourseController extends Controller
 {
@@ -17,17 +20,7 @@ class CourseController extends Controller
     public function showAllCourses()
     {
         try{
-            // $show_all_courses = Course::all();
-            // if (!$show_all_courses) {
-            //     throw new Exception('No data available!');
-            // }
-
-
-            // $show_all_courses = DB::table('courses')
-            // ->join('course_timing', 'courses.course_id', '=', 'course_timing.course_id')
-            // ->join('users', 'courses.teacher_id', '=', 'users.user_id')
-            // ->select('courses.course_name','users.first_name','users.last_name','course_timing.start_time','course_timing.end_time','courses.course_description','courses.course_price','course_timing.day')
-            // ->get();
+            
 
 
             $show_all_courses = DB::table('courses')
@@ -65,7 +58,7 @@ class CourseController extends Controller
             $display_specific_course = DB::table('courses')
             ->join('course_timing', 'courses.course_id', '=', 'course_timing.course_id')
             ->join('users', 'courses.teacher_id', '=', 'users.user_id')
-            ->select('courses.course_name','users.first_name','users.last_name','course_timing.start_time','course_timing.end_time','courses.course_description','courses.course_price','course_timing.day','courses.type')
+            ->select('courses.course_name','courses.max_students','courses.student_count','users.email','users.first_name','users.last_name','course_timing.start_time','course_timing.end_time','courses.course_description','courses.course_price','course_timing.day','courses.type')
             ->where('courses.course_id',$id)
             ->get();
 
@@ -76,7 +69,7 @@ class CourseController extends Controller
 
             return response()->json(array(
                 'status' => true,
-                'courses' => $display_specific_course,
+                'course' => $display_specific_course,
             ));
         }
         catch (Exception $e) {
@@ -107,12 +100,14 @@ class CourseController extends Controller
                 'max_students'           => 'required',
                 'start_date'             => 'required',
                 'end_date'               => 'required',
-            );
+                'schedule'               => 'required',
+             );
             $validator = Validator::make($request->all(), $rules);
             if (!$validator->passes()) {
                 throw new Exception('All fields are required');
             }
 
+          
             $insert_course['subject_id'] = $request->subject_id;
             $insert_course['teacher_id'] = $request->teacher_id;
             $insert_course['course_name'] = $request->course_name;
@@ -125,15 +120,14 @@ class CourseController extends Controller
             $insert_course['start_date'] = $request->start_date;
             $insert_course['end_date'] = $request->end_date;
 
-            $create_course = User::create($insert_student);
-            if (!$create_course) {
-                throw new Exception('Create Course failed!');
-            }
+        
+            
+            $create_course_id = Course::create($insert_course);
 
             return response()->json(array(
                 'status' => true,
                 'status_message' => "Course Create Successful!",
-                'course' => $create_course,
+                'course' => $create_course_id,
             ));
         }
         catch (Exception $e) {
@@ -181,6 +175,37 @@ class CourseController extends Controller
             ));
         }
     }
+
+    /**
+     * retrieve all the subject available in the database
+     */
+
+    public function getAllSubjects(){
+
+    try{
+        $display_subjects = DB::table('subjects')
+        ->get();
+
+
+        if (!$display_subjects) {
+            throw new Exception('Subjects fetching failed!');
+        }
+
+
+        return response()->json(array(
+            'status' => true,
+            'subjects' => $display_subjects,
+        ));
+
+    }
+    catch (Exception $e) {
+        return response()->json(array(
+            'status' => false,
+            'status_message' => $e->getMessage(),
+        ));
+    }
+
+}
 
 
 }

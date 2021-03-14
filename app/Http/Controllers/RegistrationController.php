@@ -7,6 +7,9 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Mail\NotifyMail;
+
+use Mail;
 use Exception;
 use Validator;
 
@@ -24,15 +27,13 @@ class RegistrationController extends Controller{
             'email' => 'required',
             'phone' => 'required',
             'address' => 'required',
+            'isPending' => 'required',
         ]);
-
+        $first_name = $request -> first_name;
+        $last_name = $request -> last_name;
+        $username = $first_name." ".$last_name;
+        $email = $request -> email;
         $role = $request -> role;
-        $isPending="";
-        if($role == '3'){
-            $isPending='1';
-        }else{
-            $isPending='0';
-        }
 
         $user = User::create([
             'username' => trim($request->input('username')),
@@ -44,6 +45,7 @@ class RegistrationController extends Controller{
             'phone' => strtolower($request->input('phone')),
             'address' => strtolower($request->input('address')),
             'isPending' => strtolower($request->input('isPending')),
+
         ]);
 
 
@@ -51,6 +53,18 @@ class RegistrationController extends Controller{
         if (!$user) {
             throw new Exception('Create Course failed!');
         }
+
+
+
+        if($role == '4'){
+            Mail::to($email)->send(new NotifyMail($username));
+                if (Mail::failures()) {
+                    return response()->Fail('Sorry! Please try again latter');
+                }else{
+                    return response()->success('Great! Successfully send in your mail');
+                }
+        }
+
 
         return response()->json(array(
             'status' => true,
@@ -68,4 +82,6 @@ class RegistrationController extends Controller{
 
 
     }
+
+
 }
