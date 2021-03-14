@@ -96,7 +96,7 @@ class StudentController extends Controller
             ->join('course_students', 'courses.course_id', '=', 'course_students.course_id')
             ->join('users', 'course_students.student_id', '=', 'users.user_id')
             ->join('users as tu', 'courses.teacher_id', '=', 'tu.user_id')
-            ->select('courses.course_name','courses.min_students','courses.type',
+            ->select('courses.course_id','courses.course_name','courses.min_students','courses.type',
                      'courses.min_students','courses.max_students','courses.student_count',
                      'tu.username')
             ->where('users.user_id',$id)
