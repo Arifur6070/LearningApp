@@ -122,7 +122,60 @@ class CourseController extends Controller
 
         
             
-            $create_course_id = Course::create($insert_course);
+            $create_course_id = Course::insert($insert_course);
+
+            return response()->json(array(
+                'status' => true,
+                'status_message' => "Course Create Successful!",
+                'course' => $create_course_id,
+            ));
+            // if (!$create_course_id) {
+            //     throw new Exception('Create Course failed!');
+            // }
+         
+
+            $json_schedule =$request->schedule;
+
+            for($i=0;$i<sizeof($json_schedule);$i++){
+                $insert_schedule['course_id'] = $create_course_id;
+                $insert_schedule['day'] = $json_schedule[$i]['day'];
+                $insert_schedule['start_time'] = $json_schedule[$i]['start_time'];
+                $insert_schedule['end_time'] = $json_schedule[$i]['end_time'];
+                $insert_schedule_DB = DB::table('course_timing')->insert($insert_schedule);
+                if(!$insert_schedule_DB){
+                   throw new Exception('schedule inserting failed');
+                }
+            }
+
+            // $start_date=$request->start_date;
+            // $end_date=$request->end_date;
+            // $numberOfDays=0;
+            // $checker=[];
+            // for($i=0;$i<sizeof($json_schedule);$i++){
+            //     $no = 0;
+            //     $start = new DateTime($start_date);
+            //     $end   = new DateTime($end_date);
+            //     $interval = DateInterval::createFromDateString('1 day');
+            //     $period = new DatePeriod($start, $interval, $end);
+            //     foreach ($period as $dt)
+            //     {
+            //         if ($dt->format('N') == 7)
+            //         {
+            //             $no++;
+            //         }
+            //     }
+            // }
+
+        //     for($i=0;$i<sizeof($json_schedule);$i++){
+        //         $fridays = [];
+        //         $startDate = Carbon::parse($start_date)->modify('this'." ".$json_schedule[$i]['day']); // Get the first friday. If $fromDate is a friday, it will include $fromDate as a friday
+        //         $endDate = Carbon::parse($toDate);
+
+        //         for ($date = $startDate; $date->lte($end_date); $date->addWeek()) {
+        //             $fridays[] = $date->format('Y-m-d');
+        //     }
+        //     $checker[]=$fridays;
+        // }
 
             return response()->json(array(
                 'status' => true,

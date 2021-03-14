@@ -52,7 +52,7 @@ class StudentController extends Controller
             $insert_course_students['course_id'] = $request->course_id;
             $insert_course_students['student_id'] = $request->student_id;
 
-            $enroll_student = DB::table('course_students')->create($insert_course_students);
+            $enroll_student = DB::table('course_students')->insert($insert_course_students);
             if (!$enroll_student) {
                 throw new Exception('student enroll failed!');
             }
