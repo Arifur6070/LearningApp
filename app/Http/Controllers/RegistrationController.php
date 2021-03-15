@@ -61,7 +61,11 @@ class RegistrationController extends Controller{
                 if (Mail::failures()) {
                     return response()->Fail('Sorry! Please try again latter');
                 }else{
-                    return response()->success('Great! Successfully send in your mail');
+                    return response()->json(array(
+                        'status' => true,
+                        'status_message' => "User Create Successful!",
+                        'user' => $user,
+                    ));
                 }
         }
 
