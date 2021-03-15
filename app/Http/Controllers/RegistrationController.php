@@ -44,7 +44,7 @@ class RegistrationController extends Controller{
             'last_name' => strtolower($request->input('last_name')),
             'phone' => strtolower($request->input('phone')),
             'address' => strtolower($request->input('address')),
-            'isPending' => strtolower($request->input('isPending')),
+            'is_pending' => strtolower($request->input('isPending')),
 
         ]);
 
