@@ -112,8 +112,6 @@ class TeacherController extends Controller
          try{
              $rules = array(
                  'username'  => 'required',
-                 'password'     => 'required',
-                 'role'     => 'required',
                  'first_name'  => 'required',
                  'last_name'   => 'required',
                  'email'         => 'required',
@@ -126,13 +124,12 @@ class TeacherController extends Controller
              }
 
              $update_user['username'] = $request->username;
-             $update_user['role'] = $request->role;
              $update_user['first_name'] = $request->first_name;
              $update_user['last_name'] = $request->last_name;
              $update_user['email'] = $request->email;
              $update_user['phone'] = $request->phone;
              $update_user['address'] = $request->address;
-             $update_user['password'] = Hash::make($request->password);
+            
 
              $update = User::where('user_id', $id)
                  ->update($update_user);

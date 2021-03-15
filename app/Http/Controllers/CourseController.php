@@ -122,7 +122,7 @@ class CourseController extends Controller
 
         
             
-            $create_course_id = Course::insert($insert_course);
+            $create_course_id = Course::create($insert_course);
 
             return response()->json(array(
                 'status' => true,
