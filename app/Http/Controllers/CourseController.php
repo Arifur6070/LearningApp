@@ -20,12 +20,16 @@ class CourseController extends Controller
     public function showAllCourses()
     {
         try{
-            
+
 
 
             $show_all_courses = DB::table('courses')
             ->join('users', 'courses.teacher_id', '=', 'users.user_id')
             ->get();
+
+            // return view('admin.student', $show_all_courses);
+
+            return view('admin.student', compact('show_all_courses'));
 
             return response()->json(array(
                 'status' => true,
@@ -55,21 +59,41 @@ class CourseController extends Controller
                 throw new Exception('Course doesnot exist!');
             }
 
-            $display_specific_course = DB::table('courses')
-            ->join('course_timing', 'courses.course_id', '=', 'course_timing.course_id')
+            $display_course_info = DB::table('courses')
+            ->join('categories', 'courses.category_id', '=', 'categories.category_id')
+            ->select('courses.course_id','courses.course_name','courses.course_image_path','courses.max_students','courses.student_count','courses.start_date','courses.end_date','courses.course_description','courses.course_price','courses.rating','categories.category_name','courses.type')
+            ->where('courses.course_id',$id)
+            ->get();
+
+            $display_teacher_info = DB::table('courses')
             ->join('users', 'courses.teacher_id', '=', 'users.user_id')
-            ->select('courses.course_name','courses.max_students','courses.student_count','users.email','users.first_name','users.last_name','course_timing.start_time','course_timing.end_time','courses.course_description','courses.course_price','course_timing.day','courses.type')
+            ->select('users.user_id','users.user_name','users.first_name','users.user_image_path','users.last_name',)
+            ->where('courses.course_id',$id)
+            ->get();
+
+            $display_lecture_info = DB::table('lectures')
+            ->Where('course_id',$id)
+            ->get();
+
+            $display_comments=DB::table('courses')
+            ->join('comments', 'comments.course_id', '=', 'courses.course_id')
+            ->join('users', 'users.user_id', '=', 'courses.teacher_id')
+            ->select('comments.comment_text','users.username','users.first_name','users.user_image_path','users.last_name')
             ->where('courses.course_id',$id)
             ->get();
 
 
-            if (!$display_specific_course) {
+            if (!$display_course_info) {
                 throw new Exception('Course details fetching failed!');
             }
 
             return response()->json(array(
                 'status' => true,
-                'course' => $display_specific_course,
+                'message'=> 'course details fetching successful',
+                'course' => $display_course_info,
+                'teacher'=> $display_teacher_info,
+                'lectures'=> $display_lecture_info,
+                'comments'=> $display_comments
             ));
         }
         catch (Exception $e) {
@@ -107,7 +131,7 @@ class CourseController extends Controller
                 throw new Exception('All fields are required');
             }
 
-          
+
             $insert_course['subject_id'] = $request->subject_id;
             $insert_course['teacher_id'] = $request->teacher_id;
             $insert_course['course_name'] = $request->course_name;
@@ -120,8 +144,8 @@ class CourseController extends Controller
             $insert_course['start_date'] = $request->start_date;
             $insert_course['end_date'] = $request->end_date;
 
-        
-            
+
+
             $create_course_id = Course::create($insert_course);
 
             return response()->json(array(
@@ -132,7 +156,7 @@ class CourseController extends Controller
             // if (!$create_course_id) {
             //     throw new Exception('Create Course failed!');
             // }
-         
+
 
             $json_schedule =$request->schedule;
 
